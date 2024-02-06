@@ -200,6 +200,15 @@ function renderListContent(listObject, listObjectIndex) {
   createTaskForm.addEventListener("submit", (e) => {
     e.preventDefault();
     const taskTitle = document.querySelector("#new-todo-title");
+    let isExist = false
+    todoLists.lists[listObjectIndex].tasks.forEach((task) =>{
+      if (task.title === taskTitle.value){
+          isExist = true ;
+      }
+    })
+    if(isExist){
+      return false;
+    }
     const taskDetails = document.querySelector("#new-todo-details");
     const dueDate = document.querySelector("#new-todo-date");
     const priorityBtns = document.getElementsByName ("create-new-priority");
@@ -248,8 +257,8 @@ function renderTasks(listObjectIndex, tasksContainer) {
 function removeObjectByTitle(array, titleToRemove) {
   // Use the filter method to create a new array excluding the object with the specified title
   const newArray = array.filter(obj => obj.title !== titleToRemove);
-
-  return newArray;
+  array.length = 0;
+  Array.prototype.push.apply(array, newArray);
 }
 
 function taskContainerEventHandeler(task,taskContainer,listObjectIndex,tasksContainer){
@@ -257,19 +266,35 @@ function taskContainerEventHandeler(task,taskContainer,listObjectIndex,tasksCont
     
     const taskContainerElement = e.target;
     
+    
       if (taskContainerElement.classList.contains("task-details")) {
-          modal.textContent = task.taskDetails;
+          modalText.textContent = task.description;
+          
           modal.show();
       } else if (taskContainerElement.classList.contains("task-notes")) {
-          modal.textContent = task.notes;
+        if(task.notes === ""){
+          
+          modalText.textContent = "no notes here ";
+        }
+        else{
+          modalText.textContent = task.notes;
+        }
+          
           modal.show();
-      } else if (taskContainerElement.classList.contains("delete-task-btn")) {
+      } else {if (taskContainerElement.classList.contains("delete-task-btn")) {
           console.log("work");
-          todoLists.lists[listObjectIndex].tasks = removeObjectByTitle(todoLists.lists[listObjectIndex].tasks, task.title);
+          removeObjectByTitle(todoLists.lists[listObjectIndex].tasks, task.title);
           console.log(todoLists.lists[listObjectIndex]);
           updateLocalStorageData();
+          
           renderTasks(listObjectIndex, tasksContainer);
       }
+      else{
+        if (taskContainerElement.classList.contains("edit-task")){
+
+        }
+      }
+    }
   
 
    
@@ -277,7 +302,11 @@ function taskContainerEventHandeler(task,taskContainer,listObjectIndex,tasksCont
 }
 
 const modal = document.querySelector(".modal");
-
+const modalText = document.querySelector(".modal-text");
+const closeModalBTn = document.querySelector(".close-modal");
+closeModalBTn.addEventListener("click",() =>{
+  modal.close();
+})
 
 
 function renderTask(task, taskContainer) {
