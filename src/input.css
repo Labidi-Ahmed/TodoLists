@@ -1,67 +1,216 @@
+/* Global Styles */
+
 * {
     box-sizing: border-box;
+    margin: 0;
+    padding: 0;
 }
 
 :root {
-    --primary-bg: #f5f5f5;    /* Light Gray */
-    --secondary-bg: #ffffff;   /* White */
-    --primary-text: #333333;   /* Dark Gray */
-    --secondary-text: #666666; /* Medium Gray */
-    --accent-color: #3498db;   /* Dodger Blue */
-    --accent-hover: #2980b9;   /* Darker Dodger Blue */
-    --success-color: #2ecc71;  /* Emerald Green */
-    --danger-color: #e74c3c;   /* Tomato Red */
-    --warning-color: #f39c12;  /* Sunflower Yellow */
-    --info-color: #3498db;     /* Dodger Blue */
+    --color-primary: #1877F2; /* Blue */
+    
+    --color-background:#fff;
+    --color-light:#fffefe;
+    --color-gray:#dadedf;
+    --color-dark:#1c1e21;
+    --color-orange:#eb5542;
+    --color-green:#61cd77;
+    --sidebar-width:700px;
+
+    --color-gray-1: rgb(233, 235, 238);
+    --color-gray-2: rgb(246, 247, 249) ;
+    font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
 }
 
-
-.container{
-    display: flex;
-    flex-direction: column;
-
-    gap: 150px;
-    align-items: center;
+body {
     
-    min-height: 100vh;
-  
-   
+    background-color: var(--color-gray-2);
+    color: var(--color-dark);
+    padding: 20px;
+}
+
+.container {
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    color: var(--color-dark);
+}
+
+aside {
+    max-width:var(--sidebar-width);
+    min-height: calc(100vh - 40px);
+    background-color: var(--color-background);
+    border-radius: 8px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    padding: 20px;
+    margin-right: 20px;
+    color: var();
+}
+
+.lists-header {
+    font-size: 1.5rem;
+    font-weight: bold;
+    margin-bottom: 20px;
+    color: var(--color-primary);
+}
+
+.lists-container {
+    margin-bottom: 20px;
+    list-style: none;
+    
+
+}
+.lists-container li{
+    padding: 10px;
+}
+
+.new-list-name {
+    width: 100%;
+    padding: 8px;
+    border: 1px solid var(--color-border);
+    border-radius: 4px;
+    margin-bottom: 10px;
+}
+
+.add-list-btn {
+    width: 100%;
+    padding: 10px;
+    background-color: var(--color-primary);
+    color: var(--color-light);
+    font-size: 1.1;
+    font-weight: bold;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background-color 0.2s ease-in-out;
+}
+
+.add-list-btn:hover {
+    background-color: #3366cc;
+}
+
+.del-lists {
+    background-color: var(--color-accent);
+    border-color: var(--color-accent);
+    color: var(--color-highlight);
+}
+
+.del-lists:hover {
+    background-color: #c0392b;
 }
 
 .list-content {
-    min-height: 300px;
-    max-width: 600px;
-    background-color: rgba(0, 0, 0, 0.2);
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    background-color: var(--secondary-text);
-  
+    flex: 1;
+    margin-left: 0;
+    background-color: var();
+}
+
+.list-header {
+    font-size: 24px;
+    font-weight: bold;
+    margin-bottom: 20px;
+    color: var(--color-text);
+}
+
+.create-task-form {
+    margin-bottom: 20px;
+}
+
+.create-task-form textarea,
+.create-task-form input[type="date"],
+.create-task-form input[type="text"] {
+    width: 100%;
+    padding: 8px;
+    border: 1px solid var(--color-border);
+    border-radius: 4px;
+    margin-bottom: 10px;
+}
+
+.create-task-form input[type="radio"] {
+    margin-right: 5px;
+}
+
+.create-task-form label {
+    margin-right: 15px;
 }
 
 .task-container {
     display: flex;
-    padding: 1rem;
-    max-width: 80rem;
-    
-    gap: 2rem;
-    border: 1px solid black;
-    background-color: var(--info-color);
+    align-items: center;
+    padding: 10px;
+    border: 1px solid var(--color-border);
+    border-radius: 4px;
+    margin-bottom: 10px;
 }
 
-.tasks-container {
-    display: flex;
-    flex-direction: column;
-    gap: 1rem;
+.task-container .task-title {
+    flex: 1;
+    font-size: 18px;
+    font-weight: bold;
 }
 
-.modal {
-    min-height: 300px;
-    min-width: 250px;
-    
+.task-container .task-date {
+    font-size: 14px;
+    color: #666;
 }
 
-/* Add other styles with the new color palette as needed */
-.modal::backdrop{
-    background-color: rgba(0, 0, 0, 0.5);
+.task-container button {
+    padding: 6px 12px;
+    margin-left: 5px;
+    background-color: var(--color-primary);
+    color: var(--color-highlight);
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+.task-container button:hover {
+    background-color: #3366cc;
+}
+
+#task-done {
+    border-left: 5px solid var(--color-secondary);
+}
+
+#task-not-done {
+    border-left: 5px solid var(--color-accent);
+}
+
+/* Style for the dialog */
+dialog {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    min-width: 300px;
+    background-color: var(--color-background);
+    border: 1px solid var(--color-border);
+    border-radius: 4px;
+    padding: 20px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+}
+
+dialog button {
+    padding: 8px 16px;
+    background-color: var(--color-primary);
+    color: var(--color-highlight);
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+/* Style for the close button */
+.close-modal {
+    background-color: var(--color-accent);
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    font-size: 16px;
+    border-radius: 5px;
+    cursor: pointer;
+    margin-top: 10px;
+}
+
+.close-modal:hover {
+    background-color: #c0392b;
 }
