@@ -1,0 +1,63 @@
+this form two of the edit task  just puth the inner html equal to this  : 
+
+`
+          <h1> Edit ${task.title}</h1>
+          <form id="edit-form">
+            <input type="text" placeholder="Title of the task" id="new-todo-title" name="new-todo" maxlength="40" required="">
+            <input type="text" placeholder="Description" id="new-todo-details" name="new-todo">
+            <input type="text" placeholder="Notes" id="new-todo-note" name="new-todo">
+                    <div>
+                        <div>Due Date:</div>
+                        <input type="date" id="edit-todo-date" name="edit-todo" required="">
+                    </div>
+        
+                    <div>
+                        <div>Priority:</div>
+                        <input type="radio" id="edit-low" name="edit-priority" value="low" required="">
+                        <label for="edit-low">Low</label>
+        
+                        <input type="radio" id="edit-medium" name="edit-priority" value="medium" required="">
+                        <label for="edit-medium">Medium</label>
+        
+                        <input type="radio" id="edit-high" name="edit-priority" value="high">
+                        <label for="edit-high">High</label>
+                    </div>
+        
+                    <input type="submit" value="Edit To Do">
+                </form>`
+
+
+
+if error just puth the inner html equal to this  :
+
+this form one  of the creation tasks : 
+
+
+                `
+               
+                          
+                      
+                <div>
+                <input type="text" placeholder="Title of the task" id="new-todo-title" name="new-todo" maxlength="40" required="">
+                <input type="text" placeholder="Description" id="new-todo-details" name="new-todo">
+                <input type="text" placeholder="Notes" id="new-todo-note" name="new-todo">
+              </div>                <div>
+                                      <div class="taskform-label">Due Date</div>
+                                      <input type="date" id="new-todo-date" name="new-todo" required="">
+                                  </div>
+                      
+                                  <div>
+                                      <div class="taskform-label">Priority</div>
+                                      <input type="radio" id="create-new-low" name="create-new-priority" value="low" required="">
+                                      <label for="create-new-low">Low</label>
+                      
+                                      <input type="radio" id="create-new-medium" name="create-new-priority" value="medium" required="">
+                                      <label for="create-new-medium">Medium</label>
+                      
+                                      <input type="radio" id="create-new-high" name="create-new-priority" value="high">
+                                      <label for="create-new-high">High</label>
+                                  </div>
+                      
+                                  <input type="submit" value="Add Task" class="taskform-btn">
+                            
+                `

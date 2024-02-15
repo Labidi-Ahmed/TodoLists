@@ -73,7 +73,8 @@ const CreateTodoListsObject = () => {
 };
 
 const todoLists = CreateTodoListsObject();
-// rendering the lists 
+
+// Rendering the lists  from the lits table  inside the todoLists object ;
 function render() {
   listsContainer.innerHTML = "";
   todoLists.lists.forEach((list) => {
@@ -85,18 +86,72 @@ function render() {
   });
 }
 
-// delete all existing lists 
+// delete all existing lists from
+// the table of lists inside the todoLists object 
+//and from the lists container in the DOM
 const delListsBtn = document.querySelector(".del-lists");
 delListsBtn.addEventListener("click", () => {
   todoLists.swap([]);
-  addDataToLocalStorage([], 0);
+  updateLocalStorageData();
+  todoLists.changeCurrentListIndex(0);
+  updateLocalStorageCurrentIndex();
   render();
+  listContent.innerHTML="no current tasks";
   listsContainer.innerHTML = "";
 });
 
-
+/**
+ * Updates the local storage with the current state of the todoLists lists array.
+ * This function serializes the todoLists.lists array into JSON format and
+ * stores it in the browser's local storage under the key "lists".
+ * This allows the todo lists data to persist even after the page is refreshed or closed.
+ */
 function updateLocalStorageData() {
   window.localStorage.setItem("lists", JSON.stringify(todoLists.lists));
+}
+
+
+/**
+ * Updates the local storage with the index of the next available slot for a newly created todo list.
+ * This function retrieves the next available index from the todoLists.getCurrentIndex() method,
+ * serializes it into JSON format, and stores it in the browser's local storage
+ * under the key "currentListIndex".
+ * This allows the application to prepare an available index for the newly created todo list,
+ * ensuring that each list has a unique identifier.
+ */
+function updateLocalStorageCurrentIndex(){
+  window.localStorage.setItem(
+    "currentListIndex",
+    JSON.stringify(todoLists.getCurrentIndex()),
+  );
+}
+
+
+
+
+
+function getDataFromLocalStorage() {
+  let data = window.localStorage.getItem("lists");
+  if (data) {
+    let lists = JSON.parse(data);
+
+    return lists;
+  } else {
+    return [];
+  }
+}
+
+
+
+
+function getCurrentIndexFromLocalStorage() {
+  let currentListIndexData = window.localStorage.getItem("currentListIndex");
+  if (currentListIndexData) {
+    let currentListIndex = JSON.parse(currentListIndexData);
+    return currentListIndex;
+  } else {
+    return 0;
+  }
 }
 
 
@@ -105,35 +160,74 @@ const listContent = document.querySelector(".list-content");
 const addListBtn = document.querySelector(".add-list-btn");
 const listsContainer = document.querySelector(".lists-container");
 const listsForm = document.querySelector(".lists-form");
+const modal = document.querySelector(".modal");
+const modalText = document.querySelector(".modal-text");
+const closeModalBTn = document.querySelector(".close-modal");
 
-// apending the lists to the list container
-listsForm.addEventListener("submit", (e) => {
-  e.preventDefault();
-  //getting the new list name
-  const newListName = document.querySelector(".new-list-name").value;
-  if (newListName != "" && todoLists.checkExist(newListName) === false) {
-    // pushing the new list into our lists table
+
+
+
+closeModalBTn.addEventListener("click", () => {
+  modal.close();
+});
+
+
+
+function handleListsFormSubmit(event) {
+  event.preventDefault();
+
+  // Get the new list name and error message element
+  const newListName = document.querySelector(".new-list-name");
+  const listNameErrorMsg = document.querySelector(".listname-error");
+
+  // Check if the new list name is not empty and does not already exist
+  if (newListName.value !== "" && !todoLists.checkExist(newListName.value)) {
+    newListName.classList.remove("invalid-input");
+    listNameErrorMsg.textContent = "";
+
+    // Create a new list and append it to the todo lists container
     const newList = todoLists.createList(
-      newListName,
-      todoLists.getCurrentIndex(),
+      newListName.value,
+      todoLists.getCurrentIndex()
     );
     todoLists.appendList(newList);
     updateLocalStorageData();
 
-    //rendering the lists data from the lists array
+    // Render the updated lists data
     render();
     listsForm.reset();
-    // incrementing the current available lists table index
-    todoLists.increment();
-    window.localStorage.setItem(
-      "currentListIndex",
-      JSON.stringify(todoLists.getCurrentIndex()),
-    );
-    listEventHandeler();
 
-    //adding event listener on the appended lists
+    // Increment the current available lists table index
+    todoLists.increment();
+    updateLocalStorageCurrentIndex();
+
+    // Add event listener for the newly appended lists
+    listEventHandeler();
+  } else {
+    // Display error message if the list name is empty or already exists
+    listNameErrorMsg.textContent = "List already exists!";
+    newListName.classList.add("invalid-input");
   }
-});
+}
+
+// Event listener for the submission of the lists form
+listsForm.addEventListener("submit", handleListsFormSubmit);
+
+
+
+
+
+function listEventHandeler() {
+  const lists = document.querySelectorAll(".list-container");
+  lists.forEach((list) => {
+    list.addEventListener("click", () => {
+      listContent.innerHTML = "";
+      const listObjectIndex = list.id;
+      const listObject = todoLists.lists[listObjectIndex];
+      renderListContent(listObject, listObjectIndex);
+    });
+  });
+}
 
 
 
@@ -148,37 +242,10 @@ function renderListContent(listObject, listObjectIndex) {
 
   const createTaskForm = document.createElement("form");
   createTaskForm.classList.add("create-task-form");
-  createTaskForm.innerHTML = `
-  <div>
-            
-        
-                <div>
-                    <textarea placeholder="Title: Pay bills" id="new-todo-title" name="new-todo" maxlength="40" required=""></textarea>
-                    <textarea placeholder="Details: e.g internet, phone, rent." id="new-todo-details" name="new-todo" ></textarea>
-                    <textarea placeholder="notes" id="new-todo-note" name="new-todo" ></textarea>
-                    <div>
-                        <div>Due Date:</div>
-                        <input type="date" id="new-todo-date" name="new-todo" required="">
-                    </div>
-        
-                    <div>
-                        <div>Priority:</div>
-                        <input type="radio" id="create-new-low" name="create-new-priority" value="low" required="">
-                        <label for="create-new-low">Low</label>
-        
-                        <input type="radio" id="create-new-medium" name="create-new-priority" value="medium" required="">
-                        <label for="create-new-medium">Medium</label>
-        
-                        <input type="radio" id="create-new-high" name="create-new-priority" value="high">
-                        <label for="create-new-high">High</label>
-                    </div>
-        
-                    <input type="submit" value="Add To Do">
-                </div>
-            </div>
-  `;
+  createTaskForm.appendChild ( tasksFormCreator("") );
 
   renderTasks(listObjectIndex, tasksContainer);
+  // adding task when sumbitting the form 
   createTaskForm.addEventListener("submit", (e) => {
     e.preventDefault();
     const taskTitle = document.querySelector("#new-todo-title");
@@ -218,24 +285,73 @@ function renderListContent(listObject, listObjectIndex) {
   });
   listContent.appendChild(listHeader);
   listContent.appendChild(tasksContainer);
-  listContent.appendChild(createTaskForm);
+  
+  
+  const newTaskFormBtn = document.createElement('button');
+  newTaskFormBtn.id="new-task-form";
+  newTaskFormBtn.textContent="Add Task"
+  newTaskFormBtn.addEventListener('click',() =>{
+    modalText.innerHTML="";
+    modalText.appendChild(createTaskForm);
+    modal.show();
+  })
+  listContent.appendChild(newTaskFormBtn);
 }
 
 
 
+/**
+ * Creates and returns a form for creating or editing a task.
+ * If a task title is provided, the form is configured for editing mode,
+ * displaying the title and changing the submit button text to "Edit Task".
+ * Otherwise, it is configured for creating mode with a blank title
+ * and the submit button text set to "Add Task".
+ * The form includes input fields for the task title, description, notes, due date,
+ * and priority level, along with radio buttons for selecting priority.
+ * @param {string} taskTitle - The title of the task (if in edit mode).
+ * @returns {HTMLDivElement} - The HTML div element containing the task form.
+ */
+function tasksFormCreator(taskTitle) {
+  const div = document.createElement('div');
+  let buttonKeyword = "Add";
+  const formContent = document.createElement('div');
+  if (taskTitle != ""){
+    buttonKeyword = "Edit";
+    const header = document.createElement('h1');
+    header.id = "edit-task";
+    header.textContent = ` Edit ${taskTitle}`
+    div.appendChild(header)
+    
+  }
+ 
+  formContent.innerHTML = `
 
-function listEventHandeler() {
-  const lists = document.querySelectorAll(".list-container");
-  lists.forEach((list) => {
-    list.addEventListener("click", () => {
-      listContent.innerHTML = "";
-      const listObjectIndex = list.id;
-      const listObject = todoLists.lists[listObjectIndex];
-      renderListContent(listObject, listObjectIndex);
-    });
-  });
+      <div>
+          <input type="text" placeholder="Title of the task" id="new-todo-title" name="new-todo" maxlength="40" required="">
+          <input type="text" placeholder="Description" id="new-todo-details" name="new-todo">
+          <input type="text" placeholder="Notes" id="new-todo-note" name="new-todo">
+      </div>
+      <div>
+          <div class="taskform-label">Due Date</div>
+          <input type="date" id="new-todo-date" name="new-todo" required="">
+      </div>
+      <div>
+          <div class="taskform-label">Priority</div>
+          <input type="radio" id="create-new-low" name="create-new-priority" value="low" required="">
+          <label for="create-new-low">Low</label>
+
+          <input type="radio" id="create-new-medium" name="create-new-priority" value="medium" required="">
+          <label for="create-new-medium">Medium</label>
+
+          <input type="radio" id="create-new-high" name="create-new-priority" value="high">
+          <label for="create-new-high">High</label>
+      </div>
+      <input type="submit" value="${buttonKeyword} Task" class="taskform-btn">
+  `;
+
+  div.appendChild(formContent);
+  return div ;
 }
-
 
 
 
@@ -266,9 +382,18 @@ function removeObjectByTitle(array, titleToRemove) {
 }
 
 
-const modal = document.querySelector(".modal");
-const modalText = document.querySelector(".modal-text");
-const closeModalBTn = document.querySelector(".close-modal");
+
+
+
+/**
+ * Handles click events on buttons within a task container.
+ * Displays task details or notes in a modal when clicked.
+ * Allows deletion of tasks, editing of task details, and updating task completion status.
+ * @param {object} task - The task object associated with the task container.
+ * @param {HTMLElement} taskContainer - The HTML element representing the task container.
+ * @param {number} listObjectIndex - The index of the task list in the todoLists array.
+ * @param {HTMLElement} tasksContainer - The HTML element containing all task containers.
+ */
 
 function taskContainerEventHandeler(
   task,
@@ -278,129 +403,84 @@ function taskContainerEventHandeler(
 ) {
   taskContainer.addEventListener("click", (e) => {
     const taskContainerElement = e.target;
-
+// Show task description in modal when task details are clicked
     if (taskContainerElement.classList.contains("task-details")) {
-      modalText.textContent = task.description;
-
+      modalText.textContent = task.description === "" ? "no description here" : task.description;
       modal.show();
-    } else if (taskContainerElement.classList.contains("task-notes")) {
-      if (task.notes === "") {
-        modalText.textContent = "no notes here ";
-      } else {
-        modalText.textContent = task.notes;
-      }
-
-      modal.show();
-    } else {
-      if (taskContainerElement.classList.contains("delete-task-btn")) {
-        console.log("work");
-        removeObjectByTitle(todoLists.lists[listObjectIndex].tasks, task.title);
-        console.log(todoLists.lists[listObjectIndex]);
-        updateLocalStorageData();
-
-        renderTasks(listObjectIndex, tasksContainer);
-      } else {
-        if (taskContainerElement.classList.contains("edit-task")) {
-          modalText.innerHTML = `
-          <h1> Edit ${task.title}</h1>
-          <form id="edit-form">
-                    <textarea placeholder="Title: Pay bills" id="edit-todo-title" name="edit-todo" maxlength="40" required=""></textarea>
-                    <textarea placeholder="Details: e.g internet, phone, rent." id="edit-todo-details" name="edit-todo" ></textarea>
-                    <textarea placeholder="notes" id="edit-todo-note" name="edit-todo" ></textarea>
-                    <div>
-                        <div>Due Date:</div>
-                        <input type="date" id="edit-todo-date" name="edit-todo" required="">
-                    </div>
-        
-                    <div>
-                        <div>Priority:</div>
-                        <input type="radio" id="edit-low" name="edit-priority" value="low" required="">
-                        <label for="edit-low">Low</label>
-        
-                        <input type="radio" id="edit-medium" name="edit-priority" value="medium" required="">
-                        <label for="edit-medium">Medium</label>
-        
-                        <input type="radio" id="edit-high" name="edit-priority" value="high">
-                        <label for="edit-high">High</label>
-                    </div>
-        
-                    <input type="submit" value="Edit To Do">
-                </form>`
-                
-                modal.show();
-                const editTaskForm = document.querySelector("#edit-form");
-                editTaskForm.addEventListener("submit", (e) => {
-                  e.preventDefault();
-                  const taskTitle = document.querySelector("#edit-todo-title");
-                  let isExist = false;
-                  todoLists.lists[listObjectIndex].tasks.forEach((task) => {
-                    if (task.title === taskTitle.value) {
-                      isExist = true;
-                    }
-                  });
-                  if (isExist) {
-                    return false;
-                  }
-                  const taskDetails = document.querySelector("#edit-todo-details");
-                  const dueDate = document.querySelector("#edit-todo-date");
-                  const priorityBtns = document.getElementsByName("edit-priority");
-                  let priorityBtn;
-                  priorityBtns.forEach((btn) => {
-                    if (btn.checked) {
-                      priorityBtn = btn;
-                    }
-                  });
-                
-                  const notes = document.querySelector("#edit-todo-note");
-                  console.log(taskTitle.value)
-                  const editedTask = createTask(
-                    taskTitle.value,
-                    taskDetails.value,
-                    dueDate.value,
-                    priorityBtn.value,
-                    notes.value,
-                    0,
-                  );
-                  
-                  let  taskIndex = getTaskIndex(listObjectIndex , task);
-             
-                  console.log(taskIndex)
-                  console.log(editedTask)
-                  todoLists.lists[listObjectIndex].tasks[taskIndex] = (editedTask);
-                  updateLocalStorageData();
-              
-                  renderTasks(listObjectIndex, tasksContainer);
-                });
-
-        }
-        else{
-          if(taskContainerElement.id === 'is-done-btn'){
-            let  taskIndex = getTaskIndex(listObjectIndex , task);
-            console.log(taskIndex);
-            if(taskContainerElement.checked === true){
-              taskContainer.id="task-done";
-              console.log(todoLists.lists[listObjectIndex].tasks[taskIndex].checkList);
-              todoLists.lists[listObjectIndex].tasks[taskIndex].checkList = true;
-              console.log(todoLists.lists[listObjectIndex].tasks[taskIndex].checkList);
-              updateLocalStorageData();
-            }
-            else{
-              console.log("le")
-              console.log(taskContainerElement)
-              taskContainer.id="task-not-done";
-              todoLists.lists[listObjectIndex].tasks[taskIndex].checkList = false;
-              updateLocalStorageData();
-              
-            }
-       
-
-          }
-        }
-      }
+      return;
     }
+    // Show task notes in modal when task notes are clicked
+    if (taskContainerElement.classList.contains("task-notes")) {
+      modalText.textContent = task.notes === "" ? "no notes here" : task.notes;
+      modal.show();
+      return;
+    }
+    // Delete task when delete button is clicked
+    if (taskContainerElement.classList.contains("delete-task-btn")) {
+      console.log("work");
+      removeObjectByTitle(todoLists.lists[listObjectIndex].tasks, task.title);
+      console.log(todoLists.lists[listObjectIndex]);
+      updateLocalStorageData();
+      renderTasks(listObjectIndex, tasksContainer);
+      return;
+    }
+    // Show the form for editing the task when edit button clicked  
+    if (taskContainerElement.classList.contains("edit-task")) {
+      modalText.innerHTML = "";
+      const createTaskForm = document.createElement("form");
+      createTaskForm.classList.add("create-task-form");
+      createTaskForm.appendChild(tasksFormCreator(task.title));
+      modalText.appendChild(createTaskForm);
+      modal.show();
+      // Editing the task when the form submit 
+      createTaskForm.addEventListener("submit", (e) => {
+        e.preventDefault();
+        const taskTitle = document.querySelector("#new-todo-title");
+        let isExist = todoLists.lists[listObjectIndex].tasks.some(
+          (task) => task.title === taskTitle.value
+        );
+        if (isExist) return;
 
+        const taskDetails = document.querySelector("#new-todo-details");
+        const dueDate = document.querySelector("#new-todo-date");
+        const priorityBtns = document.getElementsByName("create-new-priority");
+        let priorityBtn;
+        priorityBtns.forEach((btn) => {
+          if (btn.checked) priorityBtn = btn;
+        });
+
+        const notes = document.querySelector("#new-todo-note");
+        const editedTask = createTask(
+          taskTitle.value,
+          taskDetails.value,
+          dueDate.value,
+          priorityBtn.value,
+          notes.value,
+          0,
+        );
+        
+        let taskIndex = getTaskIndex(listObjectIndex, task);
+        todoLists.lists[listObjectIndex].tasks[taskIndex] = editedTask;
+        updateLocalStorageData();
+        renderTasks(listObjectIndex, tasksContainer);
+        modal.close();
+      });
+      return;
+    }
+  // Update task completion status when the checkbox is clicked
+    if (taskContainerElement.id === 'is-done-btn') {
+      let taskIndex = getTaskIndex(listObjectIndex, task);
+      if (taskContainerElement.checked) {
+        taskContainer.id = "task-done";
+      } else {
+        taskContainer.id = "task-not-done";
+      }
+      todoLists.lists[listObjectIndex].tasks[taskIndex].checkList = taskContainerElement.checked;
+      updateLocalStorageData();
+    }
   });
 }
+
 
 
 
@@ -419,16 +499,18 @@ function getTaskIndex(listObjectIndex, task) {
 }
 
 
-closeModalBTn.addEventListener("click", () => {
-  modal.close();
-});
 
 
+/**
+ * Renders the content of a task within the provided task container.
+ * Displays the task title, due date, priority level, and buttons for managing the task.
+ * Allows users to view task content and notes, delete the task, or edit the task.
+ * Also includes a checkbox for marking the task as done or not done.
+ * @param {object} task - The task object containing details to be rendered.
+ * @param {HTMLElement} taskContainer - The HTML element representing the container for displaying the task content.
+ */
 function renderTask(task, taskContainer) {
-  /*  taskDetails.addEventListener("click", () => {
-    modal.textContent = task.details;
-    modal.show();
-  }); */
+
   taskContainer.id=("task-not-done");
   taskContainer.innerHTML = `
 
@@ -459,63 +541,21 @@ function renderTask(task, taskContainer) {
 
 
 
-function getDataFromLocalStorage() {
-  let data = window.localStorage.getItem("lists");
-  if (data) {
-    let lists = JSON.parse(data);
-
-    return lists;
-  } else {
-    return [];
-  }
-}
-
-
-
-
-function getCurrentIndexFromLocalStorage() {
-  let currentListIndexData = window.localStorage.getItem("currentListIndex");
-  if (currentListIndexData) {
-    let currentListIndex = JSON.parse(currentListIndexData);
-    return currentListIndex;
-  } else {
-    return 0;
-  }
-}
-
-
-
-// not used in this APP 
-function addDataToLocalStorage(lists, currentListIndex) {
-  window.localStorage.setItem("lists", JSON.stringify(lists));
-  window.localStorage.setItem(
-    "currentListIndex",
-    JSON.stringify(currentListIndex),
-  );
-  console.log(window.localStorage);
-}
-
-
-
-
-// ...
 
 async function initializeTodoLists() {
   const listsData = await getDataFromLocalStorage();
-
   const currentListIndex = await getCurrentIndexFromLocalStorage();
 
-  setLocalStorageDataToArray(listsData);
-
+  loadListsDataFromLocalStorage(listsData);
   todoLists.changeCurrentListIndex(currentListIndex);
 
   render();
   listEventHandeler();
 }
 
-// Call initializeTodoLists function
 
-function setLocalStorageDataToArray(localStorageArray) {
+
+function loadListsDataFromLocalStorage(localStorageArray) {
   localStorageArray.forEach((list) => {
     const newList = todoLists.createList(list.name, list.id);
     list.tasks.forEach((task) => {
@@ -526,3 +566,57 @@ function setLocalStorageDataToArray(localStorageArray) {
 }
 
 initializeTodoLists();
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
