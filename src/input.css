@@ -24,35 +24,111 @@
     
 }
 
+
+
 body {
     
     background-color: var(--color-gray-light);
     color: var(--color-dark);
-    padding: 20px;
+    
+   
+    
     
 }
+
+body::-webkit-scrollbar{
+    width: 0.25rem;
+}
+body::-webkit-scrollbar-track{
+    background-color: var(--color-dark);
+}
+body::-webkit-scrollbar-thumb{
+    background-color:var(--color-primary);
+}
+
+
+
+
+
+aside::-webkit-scrollbar{
+    width: 0.25rem;
+    
+}
+aside::-webkit-scrollbar-track{
+    background-color: var(--color-light);
+}
+aside::-webkit-scrollbar-thumb{
+    background-color:var(--color-primary);
+}
+
 
 
 
 .container {
-    display: flex;
+    
    
     
+    
+    
     color: inherit;
+    
+    
+    padding: 20px;
+    
+    height: 100vh;
+    display: grid;
+    grid-template-columns: 300px 1fr;
+  
+    
+   
+    
+
+
 }
 
+
+
+section {
+
+    padding-top: 20px;
+    max-height: 100%;
+    grid-column: 2/3;
+    padding: 20px;
+    padding-left: 40px;
+    
+   
+    
+    
+    
+      
+}
+    
+.tasks-container{
+    display: grid;
+    grid-template-columns: repeat(auto-fit,minmax(400px , 1fr));
+    gap: 20px;
+    
+}
+
+
+    
 aside {
-    max-width:300px;
-    min-height: calc(100vh - 40px);
+    
+    height: calc(100vh - 40px);
     background-color: var(--color-light);
     border-radius: 8px;
     box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
     padding: 20px;
-    margin-right: 20px;
+    
     color: inherit;
     font-size: 1.3rem;
-    font-weight: ;
-    position: relative
+    display: flex;
+    flex-direction: column;
+    width:  300px;
+    overflow-x: hidden;
+    transition: width 200ms ease;
+    position: fixed;
+    
 }
 
 
@@ -86,7 +162,8 @@ aside {
 .add-list-btn {
     
     border-radius: 5px;
-   padding: 10px 50px 10px 33px;
+   padding: 10px 50px ;
+   padding-left: 43px;
     color: var(--color-light);
     font-size: 0.9rem;
     ;
@@ -100,6 +177,11 @@ aside {
     
     cursor: pointer;
     transition: 333ms cubic-bezier(.53, .00, .28, 1.00) background, 333ms cubic-bezier(.53, .00, .28, 1.00) opacity;
+}
+
+.add-list-btn::before{
+    content: '+';
+   
 }
 
 
@@ -120,9 +202,10 @@ aside {
 
 
 .new-list-name {
-    width: 100%;
+    display: block;
     padding: 8px;
     margin-top: 15px;
+    max-width: 100%;
     
     border: 2px solid var(--color-gray-light);
     border-radius: 7px ;
@@ -154,8 +237,8 @@ aside {
     background-color: var(--color-accent);
     
     border: none;
-    position: absolute;
-    bottom: 0px;
+    
+    
     
     
     font-size: 1rem;
@@ -164,6 +247,7 @@ aside {
     
     
     color: var(--color-gray);
+    margin-top: auto;
 }
 
 .del-lists:hover {
@@ -180,11 +264,6 @@ aside {
 }
 
 
-.list-content {
- margin: 0 auto;
-padding-top: 20px;
-    
-}
 
 
 
@@ -235,65 +314,132 @@ padding-top: 20px;
 
 .taskform-btn{
     margin-top: 20px;
+    background-color: var(--color-light);
+    border: none;
+    padding: 10px;
+    color: var(--color-primary);
+    font-weight: ;
+    font-size: 0.9rem;
     border-radius: 5px;
-    padding: 10px;
-     color: var(--color-dark);
-     font-size: 0.9rem;
-     ;
-     border: 2px solid var(--color-light);
-     background-color: var(---);
-     display: flex;
-     gap: 10px;
-    font-weight: 700;
-    align-items: center;
+    cursor: pointer;
     
-     
-     cursor: pointer;
-     transition: 333ms cubic-bezier(.53, .00, .28, 1.00) background, 333ms cubic-bezier(.53, .00, .28, 1.00) opacity;
+}
+.taskform-btn:hover,#new-task-form:hover{
+    
+    color: var(--color-dark);
+    background-color: var();
 }
 
-
-.task-container {
+.task-container .task-info{
     display: flex;
+    gap: 10px;
     align-items: center;
-    padding: 10px;
-    border: 1px solid var(--color-border);
-    border-radius: 4px;
-    margin-bottom: 10px;
+    justify-content: center;
+   
 }
+.task-container {
+    list-style: none;
+    
+    padding: 10px;
+    background-color: var(--color-light);
+    box-shadow: 10px 8px 5px rgba(0, 0, 0, 0.2);
+    border-radius: 4px;
+    margin-bottom: 20px;
+    
+    
+
+   
+}
+
+
+
+
 
 .task-container .task-title {
-    flex: 1;
-    font-size: 18px;
+    
+    font-size: 1rem;
     font-weight: bold;
+    display: flex;
+    flex-wrap: wrap;
+   justify-content: center;
+   word-break: break-word;
+   overflow-wrap: break-word; 
 }
+
+
+.task-container .task-wrapper{
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
 
 .task-container .task-date {
     font-size: 14px;
     color: #666;
+    color: var(--color-gray);
 }
 
 .task-container button {
-    padding: 6px 12px;
-    margin-left: 5px;
-    background-color: var(--color-primary);
-    color: var(--color-highlight);
+    
+    font-size: 0.8rem;
+   
+    
+    
     border: none;
-    border-radius: 4px;
+   
+    background-color: var(--color-light);
+    color: var(--color-primary);
     cursor: pointer;
 }
 
 .task-container button:hover {
-    background-color: #3366cc;
+    color:#86acdf;
+    
+}
+.task-container #priority{
+    color: var(--color-gray);
+    
 }
 
-#task-done {
-    border-left: 5px solid var(--color-secondary);
+.task-container .delete-task-btn{
+    color: var(--color-delete);
+}
+.delete-task-btn:hover{
+    color:#f77d6f !important;
 }
 
-#task-not-done {
-    border-left: 5px solid var(--color-accent);
+#is-done-btn{
+   
+    margin-right: 5px;
+    
+    
+
+    
 }
+
+
+
+.task-container .task-info{
+display: flex;
+flex-wrap: wrap;
+  
+    
+}
+.task-container .task-actions{
+    margin-top: 20px;
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+}
+
+.task-title{
+    display: flex;
+    align-items: center;
+}
+
+
+
 
 /* Style for the dialog */
 dialog {
@@ -302,14 +448,52 @@ dialog {
     left: 50%;
     transform: translate(-50%, -50%);
     min-width: 300px;
+    max-width: 600px;
     background-color: var(--color-light);
     border: 1px solid var(--color-gray-light);
     border-radius: 4px;
     padding: 20px;
     box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
     z-index: 1;
+    
+    
+   
+    
+}
+.modal-text{
+    word-wrap: break-word; /* Break long words */
+  overflow-wrap: break-word; /* Ensure overflow wraps */
 }
 
+
+
+
+   
+  
+
+
+dialog[open] {
+    -webkit-animation: show 0.3s ease normal;
+}
+dialog.hide {
+    -webkit-animation: hide 0.3s ease normal;
+}
+@-webkit-keyframes show{
+    from {
+        opacity: 0;
+        scale: 0.9;
+    }
+    to {
+        opacity:1;
+        scale: 1;
+    }
+}
+@-webkit-keyframes hide{
+    to {
+        opacity: 0;
+        scale: 0.9;
+    }
+}
 
 
 /* Style for the close button */
@@ -326,7 +510,23 @@ dialog {
 }
 
 
-#new-task-form{
+#new-task-form {
+    
+    border: none;
+    padding: 10px;
+    color: var(--color-gray);
+    font-weight: ;
+    font-size: 0.9rem;
+    border-radius: 5px;
+    cursor: pointer;
+    background-color: var(--color-gray-light);
+    
+    
+}
+#new-task-form::before{
+    content: '+';
+    font-weight: bold;
+    margin-right: 5px;
 
 }
 
@@ -336,8 +536,107 @@ dialog {
 
 
 #task-done{
-    border-left: 10px solid var(--color-green);
+    border-right: 5px solid var(--color-green);
 }
 #task-not-done{
-    border-left: 10px solid var(--color-error);
+    border-right: 5px solid var(--color-delete);
+}
+
+
+
+
+
+
+#edit-task{
+    font-weight: bold;
+    margin-bottom: 20px;
+}
+
+
+
+
+
+
+#delete-list{
+    color: var(--color-dark);
+    
+    
+    right: 20px;
+    cursor: pointer;
+    display: none;
+    font-size: 1rem; 
+    font-weight: bold;
+    
+    
+}
+
+.list-container{
+    
+    cursor: pointer;
+    border-radius: 5px;
+    display: flex;
+    justify-content: space-between;
+    transition: background-color 100ms ease;
+    word-break: break-word;
+    overflow-wrap: break-word; 
+}   
+.list-container:hover{
+    background-color:var(--color-gray-light);
+    
+}
+
+.active-list{
+    background-color: var(--color-gray-light);
+    padding: 10px 20px;
+}
+
+
+
+@media (max-width: 900px) {
+    .container{
+        padding: 0px;
+        display: block;
+       
+    }
+    aside{
+        
+        width: 40px;
+        height: 100vh;
+        border-radius: 0px;
+        
+    }
+    section{
+        margin-left: 40px;
+        padding-left: 20px;
+       
+    }
+    aside div , aside h1{
+        display: none;
+    }
+    
+    aside:hover{
+        width: 200px;
+        z-index: 1;
+    }
+    aside:hover div , aside:hover h1{
+        display: block;
+    }
+    
+}
+
+
+
+
+
+@media (max-width: 500px) {
+
+.tasks-container{
+    grid-template-columns: repeat(auto-fit,minmax(200px , 1fr));
+}
+
+
+
+
+
+
 }

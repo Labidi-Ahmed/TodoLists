@@ -11,7 +11,7 @@ function createTask(title, description, dueDate, priority, notes, checkList) {
 
 const CreateTodoListsObject = () => {
   let lists = [];
-  let currentListIndex = 0;
+ 
 
   function swap(array) {
     lists.length = 0; // Clear the existing array without breaking references
@@ -19,14 +19,9 @@ const CreateTodoListsObject = () => {
   }
   
 
-  function getList(index) {
-    return lists[index];
-  }
 
-  function increment() {
-    currentListIndex += 1;
-  }
 
+ 
   function createList(name, id) {
     let tasks = [];
     const appendTask = (task) => {
@@ -45,46 +40,107 @@ const CreateTodoListsObject = () => {
   function appendList(newList) {
     lists.push(newList);
   }
-  function getCurrentIndex() {
-    return currentListIndex;
-  }
+ 
   function checkExist(listName) {
     return lists.some((list) => {
       return list.name === listName;
     });
   }
 
-  function changeCurrentListIndex(newIndex) {
-    currentListIndex = newIndex;
-  }
+  
 
   return {
-    increment,
     createList,
     appendList,
-    getList,
+    
     swap,
     lists,
-    getCurrentIndex,
-    currentListIndex,
     checkExist,
-    changeCurrentListIndex,
   };
 };
 
 const todoLists = CreateTodoListsObject();
 
-// Rendering the lists  from the lits table  inside the todoLists object ;
+// looping through the todoLists array and displaying each list to the Dom;
 function render() {
   listsContainer.innerHTML = "";
   todoLists.lists.forEach((list) => {
     const listContainer = document.createElement("li");
     listContainer.classList.add("list-container");
-    listContainer.textContent = list.name;
-    listContainer.id = list.id;
+    const listName=document.createElement('div');
+    listName.id="list-name"
+    listName.textContent=list.name;
+    listContainer.id = list.name;
+    const delListBtn = document.createElement('div');
+    delListBtn.textContent="x";
+    delListBtn.id="delete-list";
+
+    listContainer.appendChild(listName);
+    listContainer.appendChild(delListBtn);
+    
+    listContainer.addEventListener('mouseover',()=>{
+      delListBtn.style.display='inline';
+    })
+    listContainer.addEventListener('mouseleave',()=>{
+      delListBtn.style.display='none';
+    })
+
+    
     listsContainer.appendChild(listContainer);
+    selectedListStyle();
+    listEventHandeler();
+    deleteListEventHAndeler();
   });
+
+  
 }
+// changing the list background and padding when clicked  
+function selectedListStyle(){
+  const lists=document.querySelectorAll('.list-container');
+  lists.forEach((list)=>{
+    list.addEventListener('click',()=>{
+      const allLists = document.querySelectorAll('.active-list');
+      allLists.forEach(item => {
+        item.classList.remove('active-list');
+      });
+      list.classList.add('active-list');
+    })
+  })
+  
+
+  
+}
+
+
+function deleteListEventHAndeler(){
+  const lists=document.querySelectorAll('.list-container');
+  lists.forEach((list)=>{
+    list.addEventListener('click',(e) =>{
+      if(e.target.id==="delete-list"){
+        console.log(e.target)
+        console.log('yes');
+        const newLists=deleteList(todoLists.lists,list.id);
+        console.log(list.id);
+        console.log(newLists);
+        todoLists.swap(newLists);
+        updateLocalStorageData();
+        render();
+      }
+    })
+
+  })
+}
+
+
+function deleteList(array, listname) {
+  // Use the filter method to create a new array excluding the object with the specified title
+  const newArray = array.filter((obj) => obj.name !== listname);
+  return newArray
+}
+
+
+
+
 
 // delete all existing lists from
 // the table of lists inside the todoLists object 
@@ -93,8 +149,6 @@ const delListsBtn = document.querySelector(".del-lists");
 delListsBtn.addEventListener("click", () => {
   todoLists.swap([]);
   updateLocalStorageData();
-  todoLists.changeCurrentListIndex(0);
-  updateLocalStorageCurrentIndex();
   render();
   listContent.innerHTML="no current tasks";
   listsContainer.innerHTML = "";
@@ -111,20 +165,6 @@ function updateLocalStorageData() {
 }
 
 
-/**
- * Updates the local storage with the index of the next available slot for a newly created todo list.
- * This function retrieves the next available index from the todoLists.getCurrentIndex() method,
- * serializes it into JSON format, and stores it in the browser's local storage
- * under the key "currentListIndex".
- * This allows the application to prepare an available index for the newly created todo list,
- * ensuring that each list has a unique identifier.
- */
-function updateLocalStorageCurrentIndex(){
-  window.localStorage.setItem(
-    "currentListIndex",
-    JSON.stringify(todoLists.getCurrentIndex()),
-  );
-}
 
 
 
@@ -144,15 +184,6 @@ function getDataFromLocalStorage() {
 
 
 
-function getCurrentIndexFromLocalStorage() {
-  let currentListIndexData = window.localStorage.getItem("currentListIndex");
-  if (currentListIndexData) {
-    let currentListIndex = JSON.parse(currentListIndexData);
-    return currentListIndex;
-  } else {
-    return 0;
-  }
-}
 
 
 
@@ -162,14 +193,10 @@ const listsContainer = document.querySelector(".lists-container");
 const listsForm = document.querySelector(".lists-form");
 const modal = document.querySelector(".modal");
 const modalText = document.querySelector(".modal-text");
-const closeModalBTn = document.querySelector(".close-modal");
 
 
 
 
-closeModalBTn.addEventListener("click", () => {
-  modal.close();
-});
 
 
 
@@ -188,7 +215,6 @@ function handleListsFormSubmit(event) {
     // Create a new list and append it to the todo lists container
     const newList = todoLists.createList(
       newListName.value,
-      todoLists.getCurrentIndex()
     );
     todoLists.appendList(newList);
     updateLocalStorageData();
@@ -198,11 +224,10 @@ function handleListsFormSubmit(event) {
     listsForm.reset();
 
     // Increment the current available lists table index
-    todoLists.increment();
-    updateLocalStorageCurrentIndex();
-
+/*     todoLists.increment();
+ */   /*  updateLocalStorageCurrentIndex();
+ */
     // Add event listener for the newly appended lists
-    listEventHandeler();
   } else {
     // Display error message if the list name is empty or already exists
     listNameErrorMsg.textContent = "List already exists!";
@@ -216,14 +241,21 @@ listsForm.addEventListener("submit", handleListsFormSubmit);
 
 
 
-
+// adding click event listener for each list to display her content  
 function listEventHandeler() {
   const lists = document.querySelectorAll(".list-container");
   lists.forEach((list) => {
     list.addEventListener("click", () => {
       listContent.innerHTML = "";
-      const listObjectIndex = list.id;
-      const listObject = todoLists.lists[listObjectIndex];
+      const listObjectName = list.id;
+      let listObject;
+      let listObjectIndex;
+      for (i=0;i<todoLists.lists.length;i++){
+        if(todoLists.lists[i].name === listObjectName){
+          listObject = todoLists.lists[i];
+          listObjectIndex = i;
+        }
+      }
       renderListContent(listObject, listObjectIndex);
     });
   });
@@ -234,6 +266,9 @@ function listEventHandeler() {
 
 
 function renderListContent(listObject, listObjectIndex) {
+  if(listObject){
+    
+  
   const tasksContainer = document.createElement("ul");
   tasksContainer.classList.add("tasks-container");
   const listHeader = document.createElement("div");
@@ -297,6 +332,7 @@ function renderListContent(listObject, listObjectIndex) {
   })
   listContent.appendChild(newTaskFormBtn);
 }
+}
 
 
 
@@ -327,7 +363,7 @@ function tasksFormCreator(taskTitle) {
   formContent.innerHTML = `
 
       <div>
-          <input type="text" placeholder="Title of the task" id="new-todo-title" name="new-todo" maxlength="40" required="">
+          <input type="text" placeholder="Title of the task" id="new-todo-title" name="new-todo" maxlength="20" required="">
           <input type="text" placeholder="Description" id="new-todo-details" name="new-todo">
           <input type="text" placeholder="Notes" id="new-todo-note" name="new-todo">
       </div>
@@ -513,26 +549,37 @@ function renderTask(task, taskContainer) {
 
   taskContainer.id=("task-not-done");
   taskContainer.innerHTML = `
+  <div class="task-wrapper">
+      <div class="task-info">
+          <div class="task-title"><div>${task.title}</div></div>
+          <div class="task-date">${task.dueDate}</div>
+          <button class="task-details">Details</button>
+          <button class="task-notes">Notes</button>
+          <div id="priority">${task.priority} priority</div>
+      </div>
+      <div class="task-actions">
+          <button class="delete-task-btn">Delete</button>
+          <button class="edit-task">Edit</button>
+      </div>
+  </div>
+`;
 
-            <div class="task-title">${task.title}</div>
-            <div class="task-date">${task.dueDate}</div>
-            <button class="task-details">Details</button>
-            <button class="task-notes">notes</button>
-            <button class="delete-task-btn">DELETE TASK</button>
-            <div id="priority">${task.priority} priority</div>
-            <button class="edit-task">EDIT TASK</button>
-            
-          `;
-          const isDoneBtn = document.createElement('input')
-          isDoneBtn.type="checkbox";
+// Create and prepend the isDoneBtn checkbox
+const isDoneBtn = document.createElement('input');
+isDoneBtn.type = "checkbox";
+isDoneBtn.id = "is-done-btn";
+if (task.checkList === true) {
+  isDoneBtn.checked = true;
+  taskContainer.id = "task-done";
+}
 
-           isDoneBtn.id=("is-done-btn");
-          if(task.checkList === true){
-          isDoneBtn.checked = true;
-          taskContainer.id="task-done";
-        }
-        taskContainer.appendChild(isDoneBtn);
-        console.log(isDoneBtn)
+const taskWrapper = taskContainer.querySelector('.task-wrapper');
+const taskInfo=taskWrapper.querySelector('.task-info');
+const taskTitle = taskInfo.querySelector('.task-title');
+
+if (taskWrapper) {
+  taskTitle.insertBefore(isDoneBtn, taskTitle.firstChild);
+}
 }
 
 
@@ -544,10 +591,7 @@ function renderTask(task, taskContainer) {
 
 async function initializeTodoLists() {
   const listsData = await getDataFromLocalStorage();
-  const currentListIndex = await getCurrentIndexFromLocalStorage();
-
   loadListsDataFromLocalStorage(listsData);
-  todoLists.changeCurrentListIndex(currentListIndex);
 
   render();
   listEventHandeler();
@@ -586,6 +630,19 @@ initializeTodoLists();
 
 
 
+
+
+
+var dialog = document.querySelector('dialog');
+
+document.querySelector('.close-modal').onclick = function() {
+    dialog.classList.add('hide');
+    dialog.addEventListener('webkitAnimationEnd', function(){
+        dialog.classList.remove('hide');
+        dialog.close();
+        dialog.removeEventListener('webkitAnimationEnd',  arguments.callee, false);
+    }, false);
+};
 
 
 
