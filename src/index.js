@@ -1,3 +1,9 @@
+import './input.css';
+import './reset.css';
+
+
+
+
 function createTask(title, description, dueDate, priority, notes, checkList) {
   return {
     title,
@@ -250,7 +256,7 @@ function listEventHandeler() {
       const listObjectName = list.id;
       let listObject;
       let listObjectIndex;
-      for (i=0;i<todoLists.lists.length;i++){
+      for (let i=0;i<todoLists.lists.length;i++){
         if(todoLists.lists[i].name === listObjectName){
           listObject = todoLists.lists[i];
           listObjectIndex = i;
@@ -635,16 +641,14 @@ initializeTodoLists();
 
 var dialog = document.querySelector('dialog');
 
-document.querySelector('.close-modal').onclick = function() {
-    dialog.classList.add('hide');
-    dialog.addEventListener('webkitAnimationEnd', function(){
-        dialog.classList.remove('hide');
-        dialog.close();
-        dialog.removeEventListener('webkitAnimationEnd',  arguments.callee, false);
-    }, false);
+document.querySelector('.close-modal').onclick = function closeModal() {
+  dialog.classList.add('hide');
+  dialog.addEventListener('webkitAnimationEnd', function onAnimationEnd() {
+      dialog.classList.remove('hide');
+      dialog.close();
+      dialog.removeEventListener('webkitAnimationEnd', onAnimationEnd, false);
+  }, false);
 };
-
-
 
 
 

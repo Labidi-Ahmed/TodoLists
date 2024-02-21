@@ -2,10 +2,10 @@
 
 
 @font-face {
-    font-family: inter ;
-    src: url(./assets/Inter-Regular.ttf);
+    font-family: 'Inter';
+    src: url('./assets/Inter-Regular.ttf') format('truetype');
+    font-display: swap;
 }
-
 :root {
     --color-primary: #0064e0; /* Blue */
 
