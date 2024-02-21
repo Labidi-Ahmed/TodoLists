@@ -593,6 +593,11 @@ dialog.hide {
 
 
 @media (max-width: 900px) {
+
+    .add-list-btn{
+        font-size: 0.7rem;
+    ;
+    }
     .container{
         padding: 0px;
         display: block;
@@ -603,16 +608,20 @@ dialog.hide {
         width: 40px;
         height: 100vh;
         border-radius: 0px;
-        
+        transition: width 0.3s ease-in-out;
     }
     section{
         margin-left: 40px;
         padding-left: 20px;
        
     }
-    aside div , aside h1{
-        display: none;
-    }
+    aside div,
+aside h1 {
+    display: none;
+    opacity: 0; /* Start with opacity 0 */
+    transition: opacity 1s;
+     /* Define transition property */
+}
     
     aside:hover{
         width: 200px;
@@ -620,7 +629,14 @@ dialog.hide {
     }
     aside:hover div , aside:hover h1{
         display: block;
+        transition: display 1s;
+        
+        opacity: 1;
     }
+    .new-list-name{
+        font-size: 0.8rem;
+    }
+ 
     
 }
 
